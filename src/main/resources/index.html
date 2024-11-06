@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-time Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
+        #inputMessage { width: 80%; }
+        #sendMessage { width: 18%; }
+    </style>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+<body>
+<h1>Chat Room</h1>
+<div id="messages"></div>
+<input id="username" placeholder="Enter your name" required />
+<input id="inputMessage" placeholder="Type a message..." />
+<button id="sendMessage">Send</button>
+
+<script>
+    const socket = io('http://localhost:9092');  // Connect to the server
+
+    // Receive and display new messages
+    socket.on('receive_message', function(data) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${data.user}: ${data.message}`;
+        document.getElementById('messages').appendChild(messageElement);
+    });
+
+    // Send a new message to the server
+    document.getElementById('sendMessage').onclick = function() {
+        const user = document.getElementById('username').value;
+        const message = document.getElementById('inputMessage').value;
+        if (user && message) {
+            socket.emit('send_message', { user, message });
+            document.getElementById('inputMessage').value = '';  // Clear the input
+        }
+    };
+</script>
+</body>
+</html>
